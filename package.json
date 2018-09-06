@@ -1,7 +1,7 @@
 {
-  "name": "fis3-command-release",
+  "name": "fis3-command-ala-release",
   "description": "fis release command.",
-  "version": "1.3.18",
+  "version": "1.0.0",
   "author": "FIS Team <fis@baidu.com>",
   "homepage": "http://fis.baidu.com/",
   "keywords": [
@@ -9,7 +9,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/fex-team/fis3-command-release.git"
+    "url": "https://github.com/kaivean/fis3-command-release"
   },
   "engines": {
     "node": ">= 0.8.0"

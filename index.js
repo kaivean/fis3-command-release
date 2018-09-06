@@ -1,3 +1,8 @@
+/* eslint-disable */
+/*
+ * @file 暂无更改
+ * @author
+ */
 var _ = fis.util;
 var path = require('path');
 var watch = require('./lib/watch.js');
@@ -23,14 +28,15 @@ exports.options = {
   '--verbose': 'enable verbose mode'
 };
 
-exports.run = function(argv, cli, env) {
+// 更改：去掉命令参数，增加callback控制过程
+exports.run = function (argv, callback) {
 
   // 显示帮助信息
-  if (argv.h || argv.help) {
-    return cli.help(exports.name, exports.options);
-  }
+  // if (argv.h || argv.help) {
+  //   return cli.help(exports.name, exports.options);
+  // }
 
-  validate(argv);
+  // validate(argv);
 
   // normalize options
   var options = {
@@ -42,29 +48,32 @@ exports.run = function(argv, cli, env) {
     useLint: !!(argv.lint || argv.l),
     verbose: !!argv.verbose
   };
+  options = Object.assign(options, argv);
 
   // enable watch automatically when live is enabled.
   options.live && (options.watch = true);
 
   var app = require('./lib/chains.js')();
 
-  app.use(function(options, next) {
+  app.use(function (options, next) {
 
     // clear cache?
     if (options.clean) {
-      time(function() {
+      time(function () {
         fis.cache.clean('compile');
       });
-    } else if (env.configPath) {
-      // fis-conf 失效？
-      var cache = fis.cache(env.configPath, 'conf');
-      if(!cache.revert()){
-        cache.save();
-        time(function() {
-          fis.cache.clean('compile');
-        });
-      }
     }
+    // 更改：不需要该功能
+    // else if (env.configPath) {
+    //   // fis-conf 失效？
+    //   var cache = fis.cache(env.configPath, 'conf');
+    //   if(!cache.revert()){
+    //     cache.save();
+    //     time(function() {
+    //       fis.cache.clean('compile');
+    //     });
+    //   }
+    // }
 
     next(null, options);
   });
@@ -77,9 +86,9 @@ exports.run = function(argv, cli, env) {
   app.use(livereload.handleReloadComment);
 
   // deliver
-  app.use(function(info, next) {
+  app.use(function (info, next) {
     fis.log.debug('deploy start');
-    deploy(info, function(error) {
+    deploy(info, function (error) {
       fis.log.debug('deploy end');
       next(error, info);
     });
@@ -110,8 +119,18 @@ exports.run = function(argv, cli, env) {
     }
   }
 
+  app.use(function (info, next) {
+    options.afterReleased && options.afterReleased(info); // 更改： 每次构建完成，执行一次，watch情况下每个改动构建后也会执行
+    next(null, info);
+    // deploy(info, function (error) {
+    //   fis.log.debug('deploy end');
+    //   next(error, info);
+    // });
+  });
+
   // run it.
   app.run(options);
+
 };
 
 function validate(argv) {
@@ -121,7 +140,7 @@ function validate(argv) {
 
   var allowed = ['_', 'dest', 'd', 'lint', 'l', 'watch', 'w', 'live', 'L', 'clean', 'c', 'unique', 'u', 'verbose', 'color', 'root', 'r', 'f', 'file', 'child-flag'];
 
-  Object.keys(argv).forEach(function(k) {
+  Object.keys(argv).forEach(function (k) {
     if (!~allowed.indexOf(k)) {
       fis.log.error('The option `%s` is unregconized, please run `%s release --help`', k, fis.cli.name);
     }
