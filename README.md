@@ -1,5 +1,23 @@
 # fis-command-release
 
+## 说明
+这个版本fork了fis-command-release， 做了一些升级适配阿拉丁开发工具
+
+## 地址
+
+https://github.com/kaivean/fis3-command-release
+
+## 提交
+```
+git push origin master
+```
+
+## 发布
+发布到npmjs
+```
+npm publish
+```
+
 ## Usage
 
 ```bash
